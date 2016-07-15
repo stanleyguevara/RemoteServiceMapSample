@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Geocoder;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 
 import com.example.util.Point;
@@ -23,9 +24,12 @@ public class PointProducer {
     private Geocoder geocoder;
     private SharedPreferences prefs;
     private AlarmManager alarm;
+    private PowerManager.WakeLock lock;
     private Point current;
     private int index;
     private long scheduled;
+
+    private final String TAG = getClass().getName();
 
     static ArrayList<Point> places = new ArrayList<>();
     static {
@@ -39,21 +43,24 @@ public class PointProducer {
 
     private PointListener listener;
 
-    public PointProducer(Context context, PointListener listener) {
+    public PointProducer(Context context, PointListener listener, PowerManager manager) {
         this.listener = listener;
         this.context = context;
         geocoder = new Geocoder(context, Locale.getDefault());
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        lock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         index = prefs.getInt(KEY_CURRENT_POINT, DEFAULT_CURRENT_POINT);
         current = places.get(index);
+
     }
 
     public void wakeup() {
         schedule();
         Point point = fetch();
         if(listener != null) listener.onNewPoint(point, scheduled);
-        new GeocodeTask(listener, geocoder).execute(point);
+        lock.acquire(); //Released when GeocodeTask finishes
+        new GeocodeTask(listener, geocoder, lock).execute(point);
     }
 
     public void cancel() {

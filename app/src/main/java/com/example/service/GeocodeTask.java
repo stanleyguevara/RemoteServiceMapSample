@@ -3,6 +3,7 @@ package com.example.service;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
+import android.os.PowerManager;
 
 import com.example.util.Point;
 import com.example.util.PointListener;
@@ -17,10 +18,12 @@ public class GeocodeTask extends AsyncTask<Point, Integer, Point> {
 
     private PointListener listener;
     private Geocoder geocoder;
+    private PowerManager.WakeLock lock;
 
-    public GeocodeTask(PointListener listener, Geocoder geocoder) {
+    public GeocodeTask(PointListener listener, Geocoder geocoder, PowerManager.WakeLock lock) {
         this.listener = listener;
         this.geocoder = geocoder;
+        this.lock = lock;
     }
 
     @Override
@@ -42,5 +45,6 @@ public class GeocodeTask extends AsyncTask<Point, Integer, Point> {
     protected void onPostExecute(Point point) {
         super.onPostExecute(point);
         if(listener != null && point != null) listener.onPointUpdate(point);
+        lock.release();
     }
 }

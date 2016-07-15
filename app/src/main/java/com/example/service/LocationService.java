@@ -47,7 +47,7 @@ public class LocationService extends Service implements PointListener {
         super.onCreate();
         PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         lock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-        producer = new PointProducer(this, this);
+        producer = new PointProducer(this, this, manager);
         startAsForeground();
     }
 
@@ -76,7 +76,7 @@ public class LocationService extends Service implements PointListener {
         try {
             lock.acquire();
             if(intent == null) {
-                //Resurrected by the system after low memory
+                //Resurrected by the system after low memory condition
                 producer.wakeup();
             } else if (intent.getAction() != null) {
                 String action = intent.getAction();
