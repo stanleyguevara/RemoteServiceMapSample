@@ -28,7 +28,7 @@
         <activity
             android:name="com.example.ui.MapActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_map">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

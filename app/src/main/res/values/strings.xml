@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">Task</string>
-    <string name="title_activity_map">Map</string>
-
+    <string name="app_name">RemoteServiceMap</string>
     <string name="menu_exit">Exit</string>
 </resources>
